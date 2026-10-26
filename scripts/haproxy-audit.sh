@@ -5,7 +5,7 @@
 set -u
 CFG=${1:-/etc/haproxy/haproxy.cfg}
 FAILS=0; WARNS=0
-if [ -t 1 ]; then R=$'\e[31m'; Y=$'\e[33m'; G=$'\e[32m'; B=$'\e[1m'; N=$'\e[0m'; else R= Y= G= B= N=; fi
+if [ -t 1 ]; then R=$'\e[31m'; Y=$'\e[33m'; G=$'\e[32m'; B=$'\e[1m'; N=$'\e[0m'; else R='' Y='' G='' B='' N=''; fi
 pass() { printf '%s[PASS]%s %s\n' "$G" "$N" "$*"; }
 warn() { printf '%s[WARN]%s %s\n' "$Y" "$N" "$*"; WARNS=$((WARNS + 1)); }
 fail() { printf '%s[FAIL]%s %s\n' "$R" "$N" "$*"; FAILS=$((FAILS + 1)); }
