@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck -S warning scripts/*.sh
+
+  snippets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: haproxy -c on all snippets combined
+        run: |
+          {
+            cat snippets/global-tls.cfg
+            cat snippets/defaults-timeouts.cfg
+            printf '\tmode http\n'
+            sed 's/^\tbind 10.0.0.10:8404.*//' snippets/stats-locked.cfg
+            cat snippets/frontend-hygiene.cfg
+            printf '\tbind *:8080\n\tdefault_backend app\nbackend app\n\tserver a 127.0.0.1:9000\n'
+          } > /tmp/haproxy.cfg
+          docker run --rm -v /tmp/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro haproxy:2.8 \
+            haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg
